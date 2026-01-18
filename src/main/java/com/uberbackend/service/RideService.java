@@ -25,7 +25,7 @@ import java.util.Collection;
 public class RideService {
 
     private static final Logger logger = LoggerFactory.getLogger(RideService.class);
-    private static final double SEARCH_RADIUS_KM = 6.0;
+    private static final double SEARCH_RADIUS_KM = 5.0;
     private static final BigDecimal BASE_FARE = new BigDecimal("2.50");
     private static final BigDecimal PER_KM_FARE = new BigDecimal("1.20");
 
@@ -45,7 +45,7 @@ public class RideService {
             }
         }
 
-        Collection<Long> nearbyDriverIds = redisGeoService.findNearbyDrivers(
+        Collection<String> nearbyDriverIds = redisGeoService.findNearbyDrivers(
             request.getCity(),
             request.getPickupLatitude().doubleValue(),
             request.getPickupLongitude().doubleValue(),
@@ -55,9 +55,9 @@ public class RideService {
         Long assignedDriverId = null;
         if (!nearbyDriverIds.isEmpty()) {
             // Find first available driver
-            for (Long driverIdStr : nearbyDriverIds) {
+            for (String driverIdStr : nearbyDriverIds) {
                 try {
-                    Long driverId = driverIdStr;
+                    Long driverId = Long.parseLong(driverIdStr);
                     Driver driver = driverRepository.findByIdAndTenantIdWithLock(driverId)
                         .orElse(null);
                     if (driver != null && driver.getStatus() == DriverStatus.ONLINE) {
@@ -126,6 +126,18 @@ public class RideService {
     @Transactional
     public RideResponse getRide(Long rideId) {
         Ride ride = rideRepository.findById(rideId).orElseThrow(() -> new RuntimeException("Ride not found: " + rideId));
+        return mapToResponse(ride);
+    }
+
+    @Transactional
+    public RideResponse endRide(Long rideId) {
+        Ride ride = rideRepository.findById(rideId)
+            .orElseThrow(() -> new RuntimeException("Ride not found: " + rideId));
+
+        ride.setStatus(RideStatus.COMPLETED);
+        ride = rideRepository.save(ride);
+
+        logger.info("Ended ride: id={}", ride.getId());
         return mapToResponse(ride);
     }
 

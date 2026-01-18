@@ -41,7 +41,7 @@ public class PaymentService {
         Payment payment = Payment.builder()
             .ride(ride)
             .passengerId(ride.getPassengerId())
-            .amount(ride.getActualFare())
+            .amount(ride.getEstimatedFare())
             .paymentMethod(request.getPaymentMethod())
             .idempotencyKey(request.getIdempotencyKey())
             .build();

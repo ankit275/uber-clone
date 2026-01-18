@@ -1,7 +1,6 @@
 package com.uberbackend.repository;
 
 import com.uberbackend.model.entity.Ride;
-import com.uberbackend.model.enums.RideStatus;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

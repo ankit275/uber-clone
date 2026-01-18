@@ -5,6 +5,7 @@ import com.uberbackend.model.entity.Driver;
 import com.uberbackend.model.entity.Ride;
 import com.uberbackend.model.entity.Trip;
 import com.uberbackend.model.enums.DriverStatus;
+import com.uberbackend.model.enums.RideStatus;
 import com.uberbackend.model.enums.TripStatus;
 import com.uberbackend.repository.DriverRepository;
 import com.uberbackend.repository.RideRepository;
@@ -67,10 +68,11 @@ public class TripService {
         logger.info("Trip completed: tripId={}, rideId={}", tripId, ride.getId());
     }
 
+    @Transactional
     public Trip startTrip(Long rideId) {
         Ride ride = rideRepository.findByIdAndTenantIdWithLock(rideId).orElseThrow(() -> new RuntimeException("Ride not found"));
 
-        if(ride.getStatus() != com.uberbackend.model.enums.RideStatus.ASSIGNED) {
+        if(ride.getStatus() != RideStatus.ASSIGNED) {
             throw new IllegalStateException("Ride is not available for start trip. Status: " + ride.getStatus());
         }
 

@@ -30,4 +30,11 @@ public class RideController {
         RideResponse response = rideService.getRide(rideId);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{rideId}/end")
+    public ResponseEntity<String> endRide(@PathVariable Long rideId) {
+
+        RideResponse response = rideService.endRide(rideId);
+        return ResponseEntity.status(HttpStatus.OK).body("success");
+    }
 }
