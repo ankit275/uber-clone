@@ -166,8 +166,6 @@ public class RideService {
             .dropoffAddress(ride.getDropoffAddress())
             .estimatedFare(ride.getEstimatedFare())
             .actualFare(ride.getActualFare())
-            .createdAt(ride.getCreatedAt())
-            .updatedAt(ride.getUpdatedAt())
             .build();
     }
 }

@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
 });
 
 interface MapViewProps {
-  center: Location;
+  center?: Location;
   zoom?: number;
   pickupLocation?: Location;
   destinationLocation?: Location;
@@ -33,15 +33,19 @@ function MapUpdater({ center }: { center: Location }) {
 }
 
 export default function MapView({
-  center,
+  center = { latitude: 37.7749, longitude: -122.4194 },
   zoom = 13,
   pickupLocation,
   destinationLocation,
   driverLocation,
-  showRoute = false,
   className = '',
 }: MapViewProps) {
   const mapRef = useRef<L.Map | null>(null);
+
+  // Ensure center has valid coordinates
+  const validCenter = center && center.latitude && center.longitude 
+    ? center 
+    : { latitude: 37.7749, longitude: -122.4194 };
 
   // Create custom icons
   const pickupIcon = L.icon({
@@ -80,18 +84,16 @@ export default function MapView({
   return (
     <div className={`w-full h-full ${className}`}>
       <MapContainer
-        center={[center.latitude, center.longitude]}
+        center={[validCenter.latitude, validCenter.longitude]}
         zoom={zoom}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
-        whenCreated={(mapInstance) => {
-          mapRef.current = mapInstance;
-        }}
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapUpdater center={center} />
+        <MapUpdater center={validCenter} />
         
         {pickupLocation && (
           <Marker

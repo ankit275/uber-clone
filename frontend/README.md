@@ -48,6 +48,81 @@ frontend/
 │   │   └── TripControls.tsx
 │   ├── screens/             # Main application screens
 │   │   ├── RiderApp.tsx
+│   ├── services/            # API service layer
+│   │   ├── backendApi.ts    # Direct backend API calls
+│   │   ├── rideService.ts   # Ride operations
+│   │   ├── driverService.ts # Driver operations
+│   │   ├── tripService.ts   # Trip operations
+│   │   ├── paymentService.ts# Payment operations
+│   │   ├── tenantService.ts # Tenant operations
+│   │   └── mockService.ts   # Mock data for testing
+│   ├── utils/
+│   │   └── api.ts           # Axios instance with interceptors
+│   └── types/
+│       └── index.ts         # TypeScript type definitions
+```
+
+## API Integration
+
+All frontend API calls are integrated with the Spring Boot backend. The service layer handles all communication:
+
+### API Base URL
+- **Development**: `http://localhost:8080` (via `.env.development`)
+- **Production**: Configure `VITE_API_URL` environment variable
+
+### Available Services
+
+#### Ride Service (`src/services/rideService.ts`)
+- `createRide()` - Create a new ride request → `POST /rides`
+- `getRide()` - Get ride details → `GET /rides/{rideId}`
+- `endRide()` - End a ride → `POST /rides/{rideId}/end`
+- `getActiveRides()` - Get all active rides → `GET /rides/active`
+
+#### Driver Service (`src/services/driverService.ts`)
+- `registerDriver()` - Register a new driver → `POST /drivers`
+- `updateStatus()` - Update driver status (ONLINE/OFFLINE) → `POST /drivers/{driverId}/setStatus`
+- `updateLocation()` - Update driver location → `POST /drivers/{driverId}/location`
+- `acceptRide()` - Accept a ride request → `POST /drivers/{driverId}/accept`
+- `rejectRide()` - Reject a ride request → `POST /drivers/{driverId}/accept`
+- `getActiveDrivers()` - Get all active drivers → `GET /drivers/active`
+
+#### Trip Service (`src/services/tripService.ts`)
+- `startTrip()` - Start a trip → `POST /trips/{rideId}/start`
+- `endTrip()` - End a trip → `POST /trips/{tripId}/end`
+- `getTrip()` - Get trip details → `GET /trips/{tripId}`
+
+#### Payment Service (`src/services/paymentService.ts`)
+- `createPayment()` - Create payment → `POST /payments`
+- `getPayment()` - Get payment details → `GET /payments/{paymentId}`
+
+#### Tenant Service (`src/services/tenantService.ts`)
+- `registerTenant()` - Register a new tenant → `POST /tenants`
+- `getTenant()` - Get tenant details → `GET /tenants/{tenantId}`
+
+### Backend API Endpoints Reference
+
+All endpoints expect JSON requests and return JSON responses (except where noted).
+
+**Rides**
+- `POST /rides` - Create ride
+- `GET /rides/{rideId}` - Get ride details
+- `POST /rides/{rideId}/end` - End ride (returns plain text "success")
+
+**Drivers**
+- `POST /drivers` - Register driver
+- `POST /drivers/{driverId}/location` - Update location
+- `POST /drivers/{driverId}/accept` - Accept ride (params: rideId)
+- `POST /drivers/{driverId}/setStatus` - Update status (params: status=ONLINE|OFFLINE)
+
+**Trips**
+- `POST /trips/{rideId}/start` - Start trip
+- `POST /trips/{tripId}/end` - End trip
+
+**Payments**
+- `POST /payments` - Create payment
+
+**Tenants**
+- `POST /tenants` - Register tenant
 │   │   ├── DriverApp.tsx
 │   │   └── AdminDashboard.tsx
 │   ├── services/            # API and business logic services

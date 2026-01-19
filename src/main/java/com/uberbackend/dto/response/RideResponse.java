@@ -1,5 +1,6 @@
 package com.uberbackend.dto.response;
 
+import com.uberbackend.model.entity.Ride;
 import com.uberbackend.model.enums.RideStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,21 @@ public class RideResponse {
     private String dropoffAddress;
     private BigDecimal estimatedFare;
     private BigDecimal actualFare;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    public static RideResponse from(Ride ride) {
+        return RideResponse.builder()
+                .id(ride.getId())
+                .passengerId(ride.getPassengerId())
+                .driverId(ride.getDriverId())
+                .status(ride.getStatus())
+                .pickupLatitude(ride.getPickupLatitude())
+                .pickupLongitude(ride.getPickupLongitude())
+                .dropoffLatitude(ride.getDropoffLatitude())
+                .dropoffLongitude(ride.getDropoffLongitude())
+                .pickupAddress(ride.getPickupAddress())
+                .dropoffAddress(ride.getDropoffAddress())
+                .estimatedFare(ride.getEstimatedFare())
+                .actualFare(ride.getActualFare())
+                .build();
+    }
 }

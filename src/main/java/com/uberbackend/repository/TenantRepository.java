@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
     // Optionally find by name
     Optional<Tenant> findByName(String name);
+
+    // Find by contactEmail
+    Optional<Tenant> findByContactEmail(String contactEmail);
 }

@@ -2,6 +2,7 @@ package com.uberbackend.controller;
 
 import com.uberbackend.dto.request.CreateDriverRequest;
 import com.uberbackend.dto.request.UpdateDriverLocationRequest;
+import com.uberbackend.dto.response.DriverHistoryResponse;
 import com.uberbackend.model.entity.Driver;
 import com.uberbackend.model.entity.Tenant;
 import com.uberbackend.service.DriverService;
@@ -58,4 +59,11 @@ public class DriverController {
         driverService.updateDriverStatus(driverId, status);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{driverId}/detail")
+    public ResponseEntity<DriverHistoryResponse> getDriverDetails(@PathVariable Long driverId) {
+        DriverHistoryResponse response = driverService.getDriverDetail(driverId);
+        return ResponseEntity.ok(response);
+    }
+
 }

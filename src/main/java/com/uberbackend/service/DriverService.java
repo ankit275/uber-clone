@@ -1,21 +1,21 @@
 package com.uberbackend.service;
 
 import com.uberbackend.dto.request.UpdateDriverLocationRequest;
+import com.uberbackend.dto.response.DriverHistoryResponse;
 import com.uberbackend.model.entity.Driver;
 import com.uberbackend.model.entity.Ride;
 import com.uberbackend.model.enums.DriverStatus;
 import com.uberbackend.model.enums.RideStatus;
 import com.uberbackend.repository.DriverRepository;
 import com.uberbackend.repository.RideRepository;
-import com.uberbackend.repository.TripRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -121,5 +121,14 @@ public class DriverService {
         driver.setStatus(newStatus);
         driverRepository.save(driver);
         logger.info("Updated driver status: driverId={}, status={}", driverId, newStatus);
+    }
+
+    @Transactional
+    public DriverHistoryResponse getDriverDetail(Long driverId) {
+        Driver driver = driverRepository.findByIdAndTenantIdWithLock(driverId)
+            .orElseThrow(() -> new RuntimeException("Driver not found: " + driverId));
+        List<Ride> history = rideRepository.findByDriverIdOrderByCreatedAtDesc(driverId); // order by createdAt desc
+
+        return DriverHistoryResponse.from(driver, history);
     }
 }

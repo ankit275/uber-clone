@@ -13,7 +13,7 @@ export default function DriverPanel({ driver, onStatusChange }: DriverPanelProps
   const [pendingRides, setPendingRides] = useState<Ride[]>([]);
 
   useEffect(() => {
-    const socket = websocketService.connect();
+    websocketService.connect();
 
     // Listen for ride requests
     websocketService.onRideRequest((ride: Ride) => {
@@ -29,7 +29,8 @@ export default function DriverPanel({ driver, onStatusChange }: DriverPanelProps
     const newStatus = status === DriverStatus.OFFLINE ? DriverStatus.ONLINE : DriverStatus.OFFLINE;
     
     try {
-      await driverService.updateStatus(newStatus);
+      const driverId = typeof driver.id === 'string' ? parseInt(driver.id) : driver.id;
+      await driverService.updateStatus(driverId, newStatus);
       setStatus(newStatus);
       onStatusChange?.(newStatus);
     } catch (error) {
@@ -37,18 +38,22 @@ export default function DriverPanel({ driver, onStatusChange }: DriverPanelProps
     }
   };
 
-  const handleAcceptRide = async (rideId: string) => {
+  const handleAcceptRide = async (rideId: string | number) => {
     try {
-      await driverService.acceptRide(rideId);
+      const driverId = typeof driver.id === 'string' ? parseInt(driver.id) : driver.id;
+      const rideIdNum = typeof rideId === 'string' ? parseInt(rideId) : rideId;
+      await driverService.acceptRide(driverId, rideIdNum);
       setPendingRides((prev) => prev.filter((r) => r.id !== rideId));
     } catch (error) {
       console.error('Failed to accept ride:', error);
     }
   };
 
-  const handleRejectRide = async (rideId: string) => {
+  const handleRejectRide = async (rideId: string | number) => {
     try {
-      await driverService.rejectRide(rideId);
+      const driverId = typeof driver.id === 'string' ? parseInt(driver.id) : driver.id;
+      const rideIdNum = typeof rideId === 'string' ? parseInt(rideId) : rideId;
+      await driverService.rejectRide(driverId, rideIdNum);
       setPendingRides((prev) => prev.filter((r) => r.id !== rideId));
     } catch (error) {
       console.error('Failed to reject ride:', error);
@@ -107,7 +112,7 @@ export default function DriverPanel({ driver, onStatusChange }: DriverPanelProps
                   </div>
                   <div className="mb-3">
                     <p className="text-sm text-gray-600">Destination</p>
-                    <p className="font-medium">{ride.destinationLocation.address || 'Location'}</p>
+                    <p className="font-medium">{ride.dropoffAddress || ride.dropoffLocation?.latitude ? `${ride.dropoffLocation?.latitude}, ${ride.dropoffLocation?.longitude}` : 'Location'}</p>
                   </div>
                   {ride.estimatedFare && (
                     <p className="text-sm text-gray-600 mb-3">

@@ -25,6 +25,20 @@ export enum RideTier {
   LUXURY = 'LUXURY',
 }
 
+export enum PaymentMethod {
+  CREDIT_CARD = 'CREDIT_CARD',
+  DEBIT_CARD = 'DEBIT_CARD',
+  WALLET = 'WALLET',
+  UPI = 'UPI',
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+}
+
 export interface Location {
   latitude: number;
   longitude: number;
@@ -33,6 +47,7 @@ export interface Location {
 
 export interface Driver {
   id: string;
+  driverId?: number | string;
   name: string;
   phoneNumber: string;
   vehicleNumber: string;
@@ -42,24 +57,28 @@ export interface Driver {
 }
 
 export interface Ride {
-  id: string;
-  riderId: string;
-  driverId?: string;
+  id: number | string;
+  riderId: number | string;
+  driverId?: number | string;
+  passengerName?: string;
   pickupLocation: Location;
-  destinationLocation: Location;
+  pickupAddress?: string;
+  destinationLocation?: Location;
+  dropoffLocation?: Location;
+  dropoffAddress?: string;
   status: RideStatus;
-  tier: RideTier;
+  tier?: RideTier;
   fare?: number;
   estimatedFare?: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   driver?: Driver;
 }
 
 export interface Trip {
-  id: string;
-  rideId: string;
-  driverId: string;
+  id: string | number;
+  rideId: string | number;
+  driverId: string | number;
   status: TripStatus;
   startTime?: string;
   endTime?: string;
@@ -67,6 +86,29 @@ export interface Trip {
   endLocation?: Location;
   distance?: number;
   duration?: number;
+}
+
+export interface Payment {
+  id?: number | string;
+  rideId: number | string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface User {
+  id?: number | string;
+  email: string;
+  name: string;
+  tenantId?: number | string;
+  driverId?: number | string;
+  role?: 'RIDER' | 'DRIVER' | 'BOTH';
+  phoneNumber?: string;
+  licenseNumber?: string;
+  vehicleModel?: string;
+  vehiclePlateNumber?: string;
 }
 
 export interface SystemStats {

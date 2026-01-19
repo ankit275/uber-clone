@@ -3,7 +3,6 @@ import { SystemStats, Ride, Driver } from '../types';
 import { rideService } from '../services/rideService';
 import { driverService } from '../services/driverService';
 import { websocketService } from '../services/websocketService';
-import { mockService } from '../services/mockService';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<SystemStats>({
@@ -20,7 +19,7 @@ export default function AdminDashboard() {
     loadData();
 
     // Set up WebSocket for real-time updates
-    const socket = websocketService.connect();
+    websocketService.connect();
 
     websocketService.onRideStatusUpdate(() => {
       loadData();
@@ -39,10 +38,21 @@ export default function AdminDashboard() {
     };
   }, []);
 
+  const calculateStats = (rides: Ride[], drivers: Driver[]) => {
+    const activeRideCount = rides.filter(r => ['REQUESTED', 'ASSIGNED', 'STARTED'].includes(r.status)).length;
+    const onlineDrivers = drivers.filter(d => d.status === 'ONLINE' || d.status === 'ON_TRIP').length;
+    const totalRevenue = rides.reduce((sum, ride) => sum + (ride.fare || 0), 0);
+    
+    return {
+      activeRides: activeRideCount,
+      activeDrivers: onlineDrivers,
+      totalRidesToday: rides.length,
+      totalRevenueToday: totalRevenue,
+    };
+  };
+
   const loadData = async () => {
     try {
-      // In production, these would be real API calls
-      // For now, using mock service
       const [rides, drivers] = await Promise.all([
         rideService.getActiveRides().catch(() => []),
         driverService.getActiveDrivers().catch(() => []),
@@ -50,7 +60,8 @@ export default function AdminDashboard() {
 
       setActiveRides(rides);
       setActiveDrivers(drivers);
-      setStats(mockService.getMockStats());
+      const calculatedStats = calculateStats(rides, drivers);
+      setStats(calculatedStats);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
@@ -164,7 +175,7 @@ export default function AdminDashboard() {
                   {activeRides.map((ride) => (
                     <tr key={ride.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {ride.id.slice(-8)}
+                        {String(ride.id).slice(-8)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -175,7 +186,7 @@ export default function AdminDashboard() {
                         {ride.pickupLocation.address || 'Location'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {ride.destinationLocation.address || 'Location'}
+                        {ride.dropoffAddress || ride.dropoffLocation?.latitude ? `${ride.dropoffLocation?.latitude}, ${ride.dropoffLocation?.longitude}` : 'Location'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {ride.driver?.name || 'Not assigned'}

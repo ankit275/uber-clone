@@ -1,23 +1,19 @@
 import { api } from '../utils/api';
-import { Trip, Location } from '../types';
+import { Trip } from '../types';
 
 export const tripService = {
-  async startTrip(tripId: string, startLocation: Location): Promise<Trip> {
-    const response = await api.post<Trip>(`/api/trips/${tripId}/start`, {
-      startLocation,
-    });
+  async startTrip(rideId: number | string): Promise<Trip> {
+    const response = await api.post<Trip>(`/trips/${rideId}/start`);
     return response.data;
   },
 
-  async endTrip(tripId: string, endLocation: Location): Promise<Trip> {
-    const response = await api.post<Trip>(`/api/trips/${tripId}/end`, {
-      endLocation,
-    });
+  async endTrip(tripId: number | string): Promise<Trip> {
+    const response = await api.post<Trip>(`/trips/${tripId}/end`);
     return response.data;
   },
 
   async getTrip(tripId: string): Promise<Trip> {
-    const response = await api.get<Trip>(`/api/trips/${tripId}`);
+    const response = await api.get<Trip>(`/trips/${tripId}`);
     return response.data;
   },
 };

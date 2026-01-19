@@ -20,4 +20,6 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     Optional<Ride> findByIdAndTenantIdWithLock(@Param("id") Long id);
 
     Optional<Ride> findByIdempotencyKeyAndPassengerId(String idempotencyKey, @NotBlank(message = "Passenger ID is required") Long passengerId);
+
+    List<Ride> findByDriverIdOrderByCreatedAtDesc(Long driverId);
 }

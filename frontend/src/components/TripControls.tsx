@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trip, TripStatus, Location } from '../types';
+import { Trip, TripStatus } from '../types';
 import { tripService } from '../services/tripService';
 
 interface TripControlsProps {
@@ -14,13 +14,8 @@ export default function TripControls({ trip, onTripUpdate }: TripControlsProps) 
   const handleStartTrip = async () => {
     setLoading(true);
     try {
-      // Get current location (in production, use geolocation API)
-      const startLocation: Location = {
-        latitude: 37.7749, // Mock current location
-        longitude: -122.4194,
-      };
-
-      const updatedTrip = await tripService.startTrip(trip.id, startLocation);
+      const rideIdNum = typeof trip.id === 'string' ? parseInt(trip.id) : trip.id;
+      const updatedTrip = await tripService.startTrip(rideIdNum);
       setCurrentTrip(updatedTrip);
       onTripUpdate?.(updatedTrip);
     } catch (error) {
@@ -38,13 +33,8 @@ export default function TripControls({ trip, onTripUpdate }: TripControlsProps) 
 
     setLoading(true);
     try {
-      // Get current location (in production, use geolocation API)
-      const endLocation: Location = {
-        latitude: 37.7849, // Mock destination location
-        longitude: -122.4094,
-      };
-
-      const updatedTrip = await tripService.endTrip(trip.id, endLocation);
+      const tripIdNum = typeof trip.id === 'string' ? parseInt(trip.id) : trip.id;
+      const updatedTrip = await tripService.endTrip(tripIdNum);
       setCurrentTrip(updatedTrip);
       onTripUpdate?.(updatedTrip);
     } catch (error) {

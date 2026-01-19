@@ -29,7 +29,7 @@ export default function RideStatusComponent({ ride, onCancel }: RideStatusProps)
   const [driverLocation, setDriverLocation] = useState<Location | null>(null);
 
   useEffect(() => {
-    const socket = websocketService.connect();
+    websocketService.connect();
 
     // Listen for ride status updates
     websocketService.onRideStatusUpdate((updatedRide: Ride) => {
@@ -79,7 +79,7 @@ export default function RideStatusComponent({ ride, onCancel }: RideStatusProps)
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-800">Ride Status</h2>
-            <p className="text-sm text-gray-600">Ride ID: {currentRide.id.slice(-8)}</p>
+            <p className="text-sm text-gray-600">Ride ID: {String(currentRide.id).slice(-8)}</p>
           </div>
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[currentRide.status]}`}
@@ -108,11 +108,11 @@ export default function RideStatusComponent({ ride, onCancel }: RideStatusProps)
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-gray-600">Pickup</p>
-            <p className="font-medium">{ride.pickupLocation.address || 'Location'}</p>
+            <p className="font-medium">{ride.pickupLocation?.address || 'Location'}</p>
           </div>
           <div>
             <p className="text-gray-600">Destination</p>
-            <p className="font-medium">{ride.destinationLocation.address || 'Location'}</p>
+            <p className="font-medium">{ride.dropoffAddress || (ride.dropoffLocation?.latitude ? `${ride.dropoffLocation?.latitude}, ${ride.dropoffLocation?.longitude}` : 'Location')}</p>
           </div>
           {currentRide.estimatedFare && (
             <div>
